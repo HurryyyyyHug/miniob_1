@@ -85,19 +85,24 @@ void SessionStage::handle_event(StageEvent *event)
   return;
 }
 
+// Here the StageEvent will transfered into SessionEvent and 
+// SessionEvent will transfered into SQLStageEvent finally.
 void SessionStage::handle_request(StageEvent *event)
 {
+  // StageEvent is transfered into SessionEvent 
   SessionEvent *sev = dynamic_cast<SessionEvent *>(event);
   if (nullptr == sev) {
     LOG_ERROR("Cannot cat event to sessionEvent");
     return;
   }
 
+  // check string is null or not
   std::string sql = sev->query();
   if (common::is_blank(sql.c_str())) {
     return;
   }
 
+  // SessionEvent is transfered into SQLStageEvent to handle
   Session::set_current_session(sev->session());
   sev->session()->set_current_request(sev);
   SQLStageEvent *sql_event = new SQLStageEvent(sev, sql);
